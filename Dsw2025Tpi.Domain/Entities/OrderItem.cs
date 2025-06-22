@@ -16,6 +16,5 @@ namespace Dsw2025Tpi.Domain.Entities
         public Guid? ProductId { get; set; }
         public Guid? OrderId { get; set; }
     }
-
     
 }
