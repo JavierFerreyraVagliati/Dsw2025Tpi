@@ -1,4 +1,8 @@
 
+using Microsoft.AspNetCore.DataProtection.Repositories;
+using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Data.Repositories;
+
 namespace Dsw2025Tpi.Api;
 
 public class Program
@@ -14,6 +18,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
+        builder.Services.AddTransient<IRepository, EfRepository>();
 
         var app = builder.Build();
 

@@ -20,7 +20,15 @@ namespace Dsw2025Tpi.Domain.Entities
         public ICollection<OrderItem>? OrderItems { get; }
 
         public Product() { }
-       
 
+        public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity)
+        {
+            Sku = sku;
+            InternalCode = internalCode;
+            Name = name;
+            Description = description;
+            CurrentUnitPrice = currentUnitPrice;
+            StockQuantity = stockQuantity;
+        }
     }
 }
