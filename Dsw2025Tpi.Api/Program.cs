@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Application.Services;
 
 namespace Dsw2025Tpi.Api;
 
@@ -19,6 +20,9 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
         builder.Services.AddTransient<IRepository, EfRepository>();
+
+        builder.Services.AddScoped<ProductsManagmentService>();
+        builder.Services.AddScoped<OrdersManagmentService>();
 
         var app = builder.Build();
 

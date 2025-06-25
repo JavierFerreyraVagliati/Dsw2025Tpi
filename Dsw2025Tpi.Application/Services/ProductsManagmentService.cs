@@ -12,11 +12,11 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Dsw2025Tpi.Application.Services;
 
-public class ProductsManagementService
+public class ProductsManagmentService
 {
     private readonly IRepository _repository;
 
-    public ProductsManagementService(IRepository repository)
+    public ProductsManagmentService(IRepository repository)
     {
         _repository = repository;
     }
