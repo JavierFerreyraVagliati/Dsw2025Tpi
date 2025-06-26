@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
     [ApiController]
 
-    [Route("api/products")]
+    [Route("api/orders")]
     public class OrdersControllers : ControllerBase
     {
         private readonly OrdersManagmentService _service;

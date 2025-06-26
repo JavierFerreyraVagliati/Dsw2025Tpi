@@ -28,6 +28,11 @@ public class Program
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
 
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.CustomSchemaIds(type => type.FullName!.Replace("+", "."));
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

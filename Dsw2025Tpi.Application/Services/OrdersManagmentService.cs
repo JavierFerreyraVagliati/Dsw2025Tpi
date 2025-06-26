@@ -53,18 +53,19 @@ namespace Dsw2025Tpi.Application.Services
                 };
 
                 orderItems.Add(orderItem);
-
             }
-            var order = new Order(
+                var order = new Order(
                     shippingAddress: request.ShippingAddress,
                     billingAddress: request.BillingAddress,
                     customerId: request.CustomerId,
-                    items: orderItems
+                    orderItems: orderItems
                 );
 
-            await _repository.Add(order);
-            return new OrderModel.Response(request.CustomerId, request.ShippingAddress, request.BillingAddress, request.Items);
-        }
 
+                await _repository.Add(order);
+                return new OrderModel.Response(request.CustomerId, request.ShippingAddress, request.BillingAddress, request.Items);
+            }
+
+        }
     }
-}
+

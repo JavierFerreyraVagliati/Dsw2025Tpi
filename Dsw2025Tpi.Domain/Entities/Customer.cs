@@ -11,6 +11,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public string? Email { get; set; }
         public string? Name { get; set; }
         public string? PhoneNumber { get; set; }
-        public ICollection<Order>? Order { get; }
+        public ICollection<Order> Order { get; set; } = new List<Order>();
+
     }
 }
