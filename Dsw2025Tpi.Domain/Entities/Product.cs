@@ -29,6 +29,7 @@ namespace Dsw2025Tpi.Domain.Entities
             Description = description;
             CurrentUnitPrice = currentUnitPrice;
             StockQuantity = stockQuantity;
+            IsActive = true;
         }
     }
 }
