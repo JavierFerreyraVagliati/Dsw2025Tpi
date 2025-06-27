@@ -8,6 +8,6 @@ namespace Dsw2025Tpi.Domain.Enums
 {
     public enum OrderStatus
     {
-       PENDING,PROSESSING, SHIPPED, DELIVERED, CANCELED
+       PENDING,PROCESSING, SHIPPED, DELIVERED, CANCELED
     }
 }

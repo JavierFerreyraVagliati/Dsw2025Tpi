@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 
 
-namespace Dsw2025Ej15.Data;
+namespace Dsw2025Tpi.Data;
 
 public class InMemory : IRepository
 {

@@ -40,5 +40,40 @@ namespace Dsw2025Tpi.Api.Controllers
             return Ok(orders);
 
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderById(Guid id)
+        {
+            var product = await _service.GetOrderById(id);
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+
+        [HttpPut("{id:guid}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusModel.Request request)
+        {
+            try
+            {
+                var updatedOrder = await _service.UpdateOrderStatusAsync(id, request.NewStatus);
+
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return Problem("Se produjo un error al actualizar el estado de la orden.");
+            }
+        }
+
+
+
+
     }
 }

@@ -10,6 +10,7 @@ using System;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Data.Helpers;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Dsw2025Tpi.Api;
 
@@ -32,7 +33,12 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-      
+        builder.Services.AddControllers()
+      .AddJsonOptions(options =>
+      {
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+      });
+
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
