@@ -42,6 +42,7 @@ public class Program
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
+        builder.Services.AddScoped<CustomerManagmentService>();
 
         builder.Services.AddSwaggerGen(c =>
         {
