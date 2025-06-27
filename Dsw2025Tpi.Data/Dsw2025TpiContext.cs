@@ -52,8 +52,7 @@ public class Dsw2025TpiContext: DbContext
             order.Property(o => o.Notes)
                  .HasMaxLength(500);
 
-            order.Property(o => o.TotalAmount)
-                 .HasPrecision(15, 2);
+           
 
             order.Property(o => o.Date)
                  .IsRequired();
@@ -85,8 +84,6 @@ public class Dsw2025TpiContext: DbContext
             item.Property(i => i.Quantity)
                 .IsRequired();
 
-            item.Property(i => i.SubTotal)
-                .HasPrecision(15, 2);
 
             item.HasOne(i => i.Product)
                 .WithMany(p => p.OrderItems)
@@ -124,6 +121,7 @@ public class Dsw2025TpiContext: DbContext
             product.Property(p => p.IsActive)
                    .IsRequired();
         });
+
     }
 
 

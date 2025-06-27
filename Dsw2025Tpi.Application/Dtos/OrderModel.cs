@@ -10,6 +10,6 @@ namespace Dsw2025Tpi.Application.Dtos
     {
         public record Request(Guid CustomerId, string ShippingAddress, string BillingAddress, List <OrderItemModel.Request> Items);
 
-        public record Response(Guid CustomerId, string ShippingAddress, string BillingAddress, List<OrderItemModel.Request> Items);
+        public record Response(Guid? CustomerId, string ShippingAddress, string BillingAddress, List<OrderItemModel.Request>? Items);
     }
 }

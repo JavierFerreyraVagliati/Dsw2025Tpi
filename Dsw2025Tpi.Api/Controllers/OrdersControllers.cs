@@ -33,5 +33,12 @@ namespace Dsw2025Tpi.Api.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetOrders() {
+            var orders = await _service.GetOrders();
+            if (orders == null || !orders.Any()) return NoContent();
+            return Ok(orders);
+
+        }
     }
 }

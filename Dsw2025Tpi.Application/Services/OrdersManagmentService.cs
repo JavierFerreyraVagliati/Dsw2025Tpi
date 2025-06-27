@@ -32,6 +32,7 @@ namespace Dsw2025Tpi.Application.Services
 
             foreach (var item in request.Items)
             {
+                
                 var product = await _repository.GetById<Product>(item.ProductId);
                 if (product == null)
                     throw new ArgumentException($"Producto con ID {item.ProductId} no encontrado");
@@ -50,6 +51,7 @@ namespace Dsw2025Tpi.Application.Services
                 {
                     ProductId = product.Id,
                     Quantity = item.Quantity,
+                    UnitPrice = product.CurrentUnitPrice,
                 };
 
                 orderItems.Add(orderItem);
@@ -66,6 +68,22 @@ namespace Dsw2025Tpi.Application.Services
                 return new OrderModel.Response(request.CustomerId, request.ShippingAddress, request.BillingAddress, request.Items);
             }
 
+        public async Task<IEnumerable<OrderModel.Response>?> GetOrders()
+        {
+            var orders = await _repository.GetAll<Order>("OrderItem");
+
+            return orders.Select(o => new OrderModel.Response(
+                o.CustomerId,
+                o.ShippingAddress,
+                o.BillingAddress,
+                o.OrderItem
+                    .Where(oi => oi.ProductId.HasValue)
+                    .Select(oi => new OrderItemModel.Request(oi.Quantity, oi.ProductId.Value))
+                    .ToList()
+            ));
         }
+
+
     }
+}
 

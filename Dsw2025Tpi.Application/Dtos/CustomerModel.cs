@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Dtos
 {
-    public record OrderItemModel
+    public record CustomerModel
     {
-        public record Request(int Quantity, Guid ProductId);
+        public record Request(string? Name,string? Email,string? PhoneNumber);
 
         public record Response(int Quantity, Guid? ProductId);
     }

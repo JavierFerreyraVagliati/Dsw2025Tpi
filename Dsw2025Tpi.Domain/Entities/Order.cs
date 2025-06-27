@@ -18,14 +18,13 @@ namespace Dsw2025Tpi.Domain.Entities
             CustomerId = customerId;
             Date = DateTime.Now;
             OrderItem = orderItems;
-            TotalAmount = orderItems.Sum(item => item.Quantity * item.UnitPrice); // Supone esas propiedades
         }
 
         public DateTime Date { get; private set; }
         public string? ShippingAddress { get; set; }
-        public string? BillingAddress { get; set; } // corregido
+        public string? BillingAddress { get; set; } 
         public string? Notes { get; set; }
-        public decimal TotalAmount { get; private set; }
+        public decimal TotalAmount => OrderItem.Sum(item => item.Quantity * item.UnitPrice);
 
         public ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
         public Customer? Customer { get; set; }
