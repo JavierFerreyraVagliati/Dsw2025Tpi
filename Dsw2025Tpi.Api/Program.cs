@@ -7,6 +7,9 @@ using Dsw2025Tpi.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Data.Helpers;
+using System.Diagnostics;
 
 namespace Dsw2025Tpi.Api;
 
@@ -16,15 +19,21 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         // Add services to the container.
-        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-    options.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Dsw2025TpiDb; Integrated Security = True;"));
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options => {
+            options.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Dsw2025TpiDb; Integrated Security = True;");
+     options.UseSeeding((c, t) =>
+     {
+         ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
+     });
+        });
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
-        builder.Services.AddTransient<IRepository, EfRepository>();
 
+      
+        builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
 
@@ -32,8 +41,11 @@ public class Program
         {
             c.CustomSchemaIds(type => type.FullName!.Replace("+", "."));
         });
+   
+     
 
         var app = builder.Build();
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
