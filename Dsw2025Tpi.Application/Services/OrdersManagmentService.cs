@@ -80,7 +80,11 @@ namespace Dsw2025Tpi.Application.Services
                 o.OrderStatus,
                 o.OrderItem
                     .Where(oi => oi.ProductId.HasValue)
-                    .Select(oi => new OrderItemModel.Request(oi.Quantity, oi.ProductId.Value))
+                    .Select(oi => new OrderItemModel.Request(oi.Quantity,
+                    oi.ProductId.Value
+                    , oi.Product?.Name,
+                    oi.Product?.Description,
+                    oi.Product?.CurrentUnitPrice))
                     .ToList()
             ));
         }
@@ -94,7 +98,7 @@ namespace Dsw2025Tpi.Application.Services
                 order.OrderStatus,
                 order.OrderItem
                     .Where(oi => oi.ProductId.HasValue)
-                    .Select(oi => new OrderItemModel.Request(oi.Quantity, oi.ProductId.Value))
+                    .Select(oi => new OrderItemModel.Request(oi.Quantity, oi.ProductId.Value, oi.Product?.Name, oi.Product?.Description,oi.Product.CurrentUnitPrice))
                     .ToList());
         }
 
@@ -115,15 +119,12 @@ namespace Dsw2025Tpi.Application.Services
                 order.CustomerId,
                 order.ShippingAddress,
                 order.BillingAddress,
-                order.OrderStatus, // Asumo que este campo es string en el DTO
+                order.OrderStatus, 
                 order.OrderItem
-                    .Where(oi => oi.ProductId.HasValue) // ← Evitás nulls
+                    .Where(oi => oi.ProductId.HasValue) 
                     .Select(oi =>
-                        new OrderItemModel.Request(
-                            oi.Quantity,
-                            oi.ProductId!.Value // ← Convertís Guid? a Guid seguro
-                        )
-                    )
+                        new OrderItemModel.Request(oi.Quantity, oi.ProductId.Value, oi.Product.Name, oi.Product.Description,oi.Product.CurrentUnitPrice))
+                    
                     .ToList()
             );
         }

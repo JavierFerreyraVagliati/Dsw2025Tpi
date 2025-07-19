@@ -21,11 +21,11 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         // Add services to the container.
         builder.Services.AddDbContext<Dsw2025TpiContext>(options => {
-            options.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Dsw2025TpiDb; Integrated Security = True;");
+        options.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Dsw2025TpiDb; Integrated Security = True;");
      options.UseSeeding((c, t) =>
      {
          ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
-     });
+    });
         });
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -42,7 +42,7 @@ public class Program
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
-
+        builder.Services.AddScoped<CustomerManagmentService>();
         builder.Services.AddSwaggerGen(c =>
         {
             c.CustomSchemaIds(type => type.FullName!.Replace("+", "."));

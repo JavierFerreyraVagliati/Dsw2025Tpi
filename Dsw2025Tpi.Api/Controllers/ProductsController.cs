@@ -81,7 +81,7 @@ public class ProductsController : ControllerBase
         try
         {
             await _service.InactivateProduct(id);
-            return Ok();
+            return NoContent ();
         }
         catch(EntityNotFoundException en) {
             return BadRequest(en.Message);
