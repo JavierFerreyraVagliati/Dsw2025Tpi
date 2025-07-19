@@ -1,0 +1,72 @@
+[
+    {
+        "id": "11111111-aaaa-bbbb-cccc-111111111111",
+        "email": "ana.garcia@example.com",
+        "name": "Ana García",
+        "phoneNumber": "3511234567",
+        "order": []
+    },
+    {
+        "id": "22222222-aaaa-bbbb-cccc-222222222222",
+        "email": "luis.perez@example.com",
+        "name": "Luis Pérez",
+        "phoneNumber": "3517654321",
+        "order": []
+    },
+    {
+        "id": "33333333-aaaa-bbbb-cccc-333333333333",
+        "email": "carla.mendez@example.com",
+        "name": "Carla Méndez",
+        "phoneNumber": "3547123456",
+        "order": []
+    },
+    {
+        "id": "44444444-aaaa-bbbb-cccc-444444444444",
+        "email": "juan.lopez@example.com",
+        "name": "Juan López",
+        "phoneNumber": "3589123456",
+        "order": []
+    },
+    {
+        "id": "55555555-aaaa-bbbb-cccc-555555555555",
+        "email": "martin.sosa@example.com",
+        "name": "Martín Sosa",
+        "phoneNumber": "3564123456",
+        "order": []
+    },
+    {
+        "id": "66666666-aaaa-bbbb-cccc-666666666666",
+        "email": "laura.ramos@example.com",
+        "name": "Laura Ramos",
+        "phoneNumber": "3535123456",
+        "order": []
+    },
+    {
+        "id": "77777777-aaaa-bbbb-cccc-777777777777",
+        "email": "franco.gimenez@example.com",
+        "name": "Franco Giménez",
+        "phoneNumber": "3516543210",
+        "order": []
+    },
+    {
+        "id": "88888888-aaaa-bbbb-cccc-888888888888",
+        "email": "valeria.diaz@example.com",
+        "name": "Valeria Díaz",
+        "phoneNumber": "3543654321",
+        "order": []
+    },
+    {
+        "id": "99999999-aaaa-bbbb-cccc-999999999999",
+        "email": "rodrigo.farias@example.com",
+        "name": "Rodrigo Farías",
+        "phoneNumber": "3535987654",
+        "order": []
+    },
+    {
+        "id": "00000000-aaaa-bbbb-cccc-000000000000",
+        "email": "natalia.martinez@example.com",
+        "name": "Natalia Martínez",
+        "phoneNumber": "3523456789",
+        "order": []
+    }
+]
