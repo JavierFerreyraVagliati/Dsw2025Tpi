@@ -10,7 +10,6 @@ namespace Dsw2025Tpi.Api.Controllers
     [Route("api/customers")]
     public class CustomersController : ControllerBase
     {
-        private readonly IRepository _repository;
         private readonly CustomerManagmentService _customerManagmentService;
 
         public CustomersController(CustomerManagmentService customerManagmentService)

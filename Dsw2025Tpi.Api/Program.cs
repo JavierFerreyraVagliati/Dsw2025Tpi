@@ -43,6 +43,7 @@ public class Program
         builder.Services.AddScoped<ProductsManagmentService>();
         builder.Services.AddScoped<OrdersManagmentService>();
         builder.Services.AddScoped<CustomerManagmentService>();
+
         builder.Services.AddSwaggerGen(c =>
         {
             c.CustomSchemaIds(type => type.FullName!.Replace("+", "."));
