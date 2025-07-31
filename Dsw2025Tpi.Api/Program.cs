@@ -31,7 +31,10 @@ public class Program
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
-
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
+        });
         // Agregar Identity
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {

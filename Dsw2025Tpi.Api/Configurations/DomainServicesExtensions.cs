@@ -13,15 +13,7 @@ public static class DomainServicesConfigurationExtension
 {
     public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<Dsw2025TpiContext>(options =>
-        {
-            options.UseSqlServer(configuration.GetConnectionString("Dsw2025TpiDb"));
-            options.UseSeeding((c, t) =>
-            {
-                ((Dsw2025TpiContext)c).Seedwork<Product>("Source\\products.json");
-                ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
-            });
-        });
+       
 
         services.AddScoped<IRepository, EfRepository>();
         services.AddScoped<ProductsManagmentService>();

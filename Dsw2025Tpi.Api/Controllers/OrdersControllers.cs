@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Application.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Tpi.Api.Controllers
 {
@@ -16,6 +17,7 @@ namespace Dsw2025Tpi.Api.Controllers
            _service = service;
         }  
         [HttpPost]
+        [Authorize(Roles = "client")]
         public async Task<IActionResult> AddOrder([FromBody] OrderModel.Request request)
         {
             try
@@ -34,6 +36,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetOrders() {
             var orders = await _service.GetOrders();
             if (orders == null || !orders.Any()) return NoContent();
@@ -42,6 +45,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
             var product = await _service.GetOrderById(id);
@@ -50,6 +54,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPut("{id:guid}/status")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusModel.Request request)
         {
             try

@@ -2,6 +2,7 @@
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Application.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -35,6 +36,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost()]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
     {
         try
@@ -53,6 +55,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> PutProduct([FromBody] ProductModel.Request request)
     {
         try
@@ -76,6 +79,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> InactivateProduct(Guid id) {
 
         try
