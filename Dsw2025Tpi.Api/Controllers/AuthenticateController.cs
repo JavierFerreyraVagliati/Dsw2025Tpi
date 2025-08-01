@@ -39,7 +39,7 @@ public class AuthenticateController : ControllerBase
             return Unauthorized("Usuario o contraseña incorrectos");
         }
 
-        var token = _jwtTokenService.GenerateToken(request.Username,"admin");
+        var token = _jwtTokenService.GenerateToken(request.Username,"client");
         return Ok(new { token });
     }
 
