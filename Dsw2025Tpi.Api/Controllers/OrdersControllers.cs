@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api.Controllers
            _service = service;
         }  
         [HttpPost]
-        [Authorize(Roles = "client")]
+        [Authorize(Roles = "client,admin")]
         public async Task<IActionResult> AddOrder([FromBody] OrderModel.Request request)
         {
             try

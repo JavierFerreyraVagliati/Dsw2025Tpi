@@ -44,6 +44,10 @@ public class ProductsController : ControllerBase
             var product = await _service.AddProduct(request);
             return Ok(product);
         }
+        catch(DuplicatedEntityException de)
+        {
+            return BadRequest(de.Message);
+        }
         catch (ArgumentException ae)
         {
             return BadRequest(ae.Message);

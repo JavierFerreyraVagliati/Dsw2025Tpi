@@ -25,11 +25,9 @@ namespace Dsw2025Tpi.Domain.Entities
         public string? BillingAddress { get; set; } 
         public string? Notes { get; set; }
         public decimal? TotalAmount => OrderItem.Sum(item => item.Quantity * item.UnitPrice);
-
         public ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
         public Customer? Customer { get; set; }
         public OrderStatus OrderStatus { get; set; }
         public Guid? CustomerId { get; set; }
     }
-
 }

@@ -31,7 +31,7 @@ namespace Dsw2025Tpi.Application.Services
 
             var orderItems = new List<OrderItem>();
 
-            foreach (var item in request.Items)
+            foreach (var item in request.OrderItems)
             {
                 
                 var product = await _repository.GetById<Product>(item.ProductId);
@@ -66,12 +66,12 @@ namespace Dsw2025Tpi.Application.Services
 
 
                 await _repository.Add(order);
-                return new OrderModel.Response(order.Id,request.CustomerId, request.ShippingAddress, request.BillingAddress,order.OrderStatus, request.Items);
+                return new OrderModel.Response(order.Id,request.CustomerId, request.ShippingAddress, request.BillingAddress,order.OrderStatus, request.OrderItems);
             }
 
         public async Task<IEnumerable<OrderModel.Response>?> GetOrders()
         {
-            var orders = await _repository.GetAll<Order>("OrderItem");
+            var orders = await _repository.GetAll<Order>("OrderItem.Product");
 
             return orders?.Select(o => new OrderModel.Response(o.Id,
                 o.CustomerId,
@@ -90,7 +90,7 @@ namespace Dsw2025Tpi.Application.Services
         }
 
         public async Task<OrderModel.Response?> GetOrderById(Guid id) {
-            var order = await _repository.GetById<Order>(id,"OrderItem");
+            var order = await _repository.GetById<Order>(id,"OrderItem.Product");
 
             return new OrderModel.Response(order.Id,order.CustomerId,
                 order.ShippingAddress,

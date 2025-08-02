@@ -21,17 +21,16 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
-
+       
         // Cargar configuración JWT
         var jwtConfig = builder.Configuration.GetSection("Jwt");
-        var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]);
+        var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("JWT Key");
+        var key = Encoding.UTF8.GetBytes(keyText);
 
-
+        // Para Identity (usuarios, roles, tokens)
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
-          
         });
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
@@ -39,12 +38,13 @@ public class Program
         });
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
             options.UseSeeding((c, t) =>
             {
                 ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
             });
         });
-        
+
         // Agregar Identity
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
@@ -145,7 +145,7 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
-            context.Seedwork<Customer>("Source\\customers.json"); // <-- llamada directa
+            context.Seedwork<Customer>("Source\\customers.json");
         }
 
         // Middlewares

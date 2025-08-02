@@ -9,11 +9,10 @@ public class Dsw2025TpiContext: DbContext
         : base(options)
     {
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
 
         modelBuilder.Entity<Customer>(customer =>
         {
@@ -36,7 +35,6 @@ public class Dsw2025TpiContext: DbContext
                     .OnDelete(DeleteBehavior.Restrict);
         });
 
-     
         modelBuilder.Entity<Order>(order =>
         {
             order.ToTable("Orders");
@@ -123,6 +121,4 @@ public class Dsw2025TpiContext: DbContext
         });
 
     }
-
-
 }
