@@ -1,18 +1,19 @@
-using Microsoft.AspNetCore.Identity;
+using Dsw2025Tpi.Api.Configurations;
+using Dsw2025Tpi.Api.Middleware;
+using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Data.Helpers;
+using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-using Dsw2025Tpi.Domain.Interfaces;
-using Dsw2025Tpi.Data;
-using Dsw2025Tpi.Data.Helpers;
-using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Application.Services;
-using Dsw2025Tpi.Api.Configurations;
-using Dsw2025Tpi.Domain.Entities;
-using Microsoft.Extensions.Options;
 
 namespace Dsw2025Tpi.Api;
 
@@ -43,6 +44,13 @@ public class Program
             {
                 ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
             });
+        });
+        builder.Services.AddProblemDetails(options =>
+        {
+            options.CustomizeProblemDetails = ctx =>
+            {
+                ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+            };
         });
 
         // Agregar Identity
@@ -141,6 +149,7 @@ public class Program
         builder.Services.AddHealthChecks();
 
         var app = builder.Build();
+        app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
         using (var scope = app.Services.CreateScope())
         {
@@ -161,6 +170,8 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseStatusCodePages();
 
         app.MapControllers();
         app.MapHealthChecks("/healthcheck");

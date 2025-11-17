@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dsw2025Tpi.Application.Common.Errors;
+using System;
+
 
 namespace Dsw2025Tpi.Application.Exceptions;
 
-public class EntityNotFoundException : System.ApplicationException
+public class EntityNotFoundException : AppException
 {
-    public EntityNotFoundException(string message) : base(message)
-    {
-    }
+
+    
+        public EntityNotFoundException(string message, int errorCode)
+            : base(message, errorCode, 404) 
+        {
+        }
+    
+
+
 }

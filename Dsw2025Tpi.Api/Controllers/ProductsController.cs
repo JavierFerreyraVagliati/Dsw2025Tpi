@@ -1,99 +1,73 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dsw2025Tpi.Api.Extensions;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Services;
-using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Dsw2025Tpi.Api.Controllers;
-
-[ApiController]
-
-[Route("api/products")]
-
-public class ProductsController : ControllerBase
+namespace Dsw2025Tpi.Api.Controllers
 {
-    private readonly ProductsManagmentService _service;
-
-    public ProductsController(ProductsManagmentService service)
+    [ApiController]
+    [Route("api/products")]
+    public class ProductsController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly ProductsManagmentService _service;
 
-    [HttpGet]
-    public async Task<IActionResult> GetProducts()
-    {
-        var products = await _service.GetProducts();
-        if (products == null || !products.Any()) return NoContent();
-        return Ok(products);
-    }
+        public ProductsController(ProductsManagmentService service)
+        {
+            _service = service;
+        }
+        [HttpGet("admin")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAuthProducts([FromQuery] ProductModel.FilterProduct filter)
+        {
+            var products = await _service.GetProducts(filter, isAdmin: true);
+            return this.ApiOk(products, "Productos obtenidos correctamente");
+        }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductBySku(Guid id)
-    {
-        var product = await _service.GetProductById(id);
-        if (product == null) return NotFound();
-        return Ok(product);
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetProducts([FromQuery] ProductModel.FilterProduct filter)
+        {
+            var products = await _service.GetProducts(filter, isAdmin: false);
+            return this.ApiOk(products, "Productos obtenidos correctamente");
+        }
 
-    [HttpPost()]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
-    {
-        try
+     
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById(Guid id)
+        {
+            var product = await _service.GetProductById(id);
+
+            return this.ApiOk(product, "Producto obtenido correctamente");
+        }
+
+     
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
         {
             var product = await _service.AddProduct(request);
-            return Ok(product);
-        }
-        catch(DuplicatedEntityException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("Se produjo un error al guardar el producto");
-        }
-    }
 
-    [HttpPut("{id}")]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> PutProduct([FromBody] ProductModel.Request request)
-    {
-        try
-        {
-            var product = await _service.PutProduct(request);
-            return Ok(product);
+            return this.ApiCreated(product, "Producto creado correctamente");
         }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (EntityNotFoundException ae)
-        {
-            return NotFound(ae.Message);
-        }
-        
-        catch (Exception)
-        {
-            return Problem("Se produjo un error al guardar el producto");
-        }
-    }
 
-    [HttpPatch("{id}")]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> InactivateProduct(Guid id) {
+    
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> PutProduct(Guid id, [FromBody] ProductModel.RequestProduct request)
+        {
+            var product = await _service.PutProduct(id, request);
 
-        try
+            return this.ApiOk(product, "Producto actualizado correctamente");
+        }
+
+       
+        [HttpPatch("{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> InactivateProduct(Guid id)
         {
             await _service.InactivateProduct(id);
-            return NoContent ();
-        }
-        catch(EntityNotFoundException en) {
-            return BadRequest(en.Message);
+
+            return this.ApiNoContent();
         }
     }
-
 }

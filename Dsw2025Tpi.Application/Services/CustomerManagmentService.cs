@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dsw2025Tpi.Application.Common.Errors;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 
@@ -22,7 +24,7 @@ namespace Dsw2025Tpi.Application.Services
         {
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Email))
             {
-                throw new ArgumentException("El nombre y el email son obligatorios.");
+                throw new ValidationAppException("El nombre y el email son obligatorios.",ErrorCodes.DatosInvalidos);
             }
             var nuevoCliente = new Customer
             {

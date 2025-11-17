@@ -21,19 +21,11 @@ namespace Dsw2025Tpi.Api.Controllers
 
         public async Task<IActionResult> CrearCliente([FromBody] CustomerModel.Request request)
         {
-            try
-            {
+            
                 var id = await _customerManagmentService.AddCustomer(request);
                 return Ok(new { Id = id });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                return Problem("Se produjo un error al crear el cliente.");
-            }
+            
+           
         }
     }
 

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dsw2025Tpi.Application.Common.Errors;
+using System;
 
-namespace Dsw2025Tpi.Application.Exceptions
+namespace Dsw2025Tpi.Application.Exceptions;
+
+public class InsufficientStockException : AppException
 {
-    public class InsufficientStockException : System.ApplicationException
+    public InsufficientStockException(string message, int errorCode)
+        : base(message, errorCode, 400) 
     {
-        public InsufficientStockException(string message) : base(message) { }
     }
 }
