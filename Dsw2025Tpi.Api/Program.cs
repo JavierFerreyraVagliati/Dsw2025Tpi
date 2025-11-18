@@ -19,7 +19,7 @@ namespace Dsw2025Tpi.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
        
@@ -153,8 +153,11 @@ public class Program
 
         using (var scope = app.Services.CreateScope())
         {
+            var services = scope.ServiceProvider;
             var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
             context.Seedwork<Customer>("Source\\customers.json");
+  
+            await SeedRolesAsync(services);
         }
 
         // Middlewares
@@ -177,5 +180,20 @@ public class Program
         app.MapHealthChecks("/healthcheck");
 
         app.Run();
+    }
+
+    static async Task SeedRolesAsync(IServiceProvider services)
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        string[] roles = { "ADMIN", "CUSTOMER", "SELLER" };
+
+        foreach (var role in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
     }
 }

@@ -15,15 +15,18 @@ namespace Dsw2025Tpi.Api.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly JwtTokenService _jwtTokenService;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthenticateController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            JwtTokenService jwtTokenService)
+            JwtTokenService jwtTokenService,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
+            _roleManager = roleManager;
         }
 
         // ============================
@@ -70,10 +73,16 @@ namespace Dsw2025Tpi.Api.Controllers
             var user = new IdentityUser
             {
                 UserName = model.Username,
-                Email = model.Email
+                Email = model.Email,
+
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
+            if (!await _roleManager.RoleExistsAsync(model.Role))
+            {
+                throw new ValidationAppException($"El rol {model.Role} no existe", ErrorCodes.DatosInvalidos);
+            }
+            await _userManager.AddToRoleAsync(user, model.Role);
 
             if (!result.Succeeded)
             {
@@ -88,5 +97,8 @@ namespace Dsw2025Tpi.Api.Controllers
 
             return this.ApiCreated(new { username = model.Username }, "Usuario registrado correctamente");
         }
+
+
+        
     }
 }

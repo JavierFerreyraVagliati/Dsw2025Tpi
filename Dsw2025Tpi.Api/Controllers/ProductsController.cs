@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api.Controllers
             _service = service;
         }
         [HttpGet("admin")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAuthProducts([FromQuery] ProductModel.FilterProduct filter)
         {
             var products = await _service.GetProducts(filter, isAdmin: true);
@@ -42,7 +42,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
      
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
         {
             var product = await _service.AddProduct(request);
@@ -52,7 +52,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
     
         [HttpPut("{id}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> PutProduct(Guid id, [FromBody] ProductModel.RequestProduct request)
         {
             var product = await _service.PutProduct(id, request);
@@ -62,7 +62,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
        
         [HttpPatch("{id}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> InactivateProduct(Guid id)
         {
             await _service.InactivateProduct(id);
