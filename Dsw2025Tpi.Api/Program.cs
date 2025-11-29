@@ -91,11 +91,16 @@ public class Program
         // CORS
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("PermitirFrontend", policy =>
-                policy.WithOrigins("http://localhost:3000")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod());
+            options.AddPolicy("AllowLocalhost",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
         });
+
 
         // Servicios propios
         builder.Services.AddTransient<IRepository, EfRepository>();
@@ -167,9 +172,8 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
 
-        app.UseCors("PermitirFrontend");
+        app.UseCors("AllowLocalhost");
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -186,7 +190,7 @@ public class Program
     {
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roles = { "ADMIN", "CUSTOMER", "SELLER" };
+        string[] roles = { "admin", "customer", "seller" };
 
         foreach (var role in roles)
         {
