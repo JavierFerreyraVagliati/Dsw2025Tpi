@@ -33,6 +33,14 @@ namespace Dsw2025Tpi.Application.Services
                     ErrorCodes.DatosInvalidos
                 );
             }
+            var customer = await _repository.GetById<Customer>(request.CustomerId);
+
+            if (customer == null) {
+                throw new EntityNotFoundException(
+                    $"Cliente con ID {request.CustomerId} no encontrado",
+                    ErrorCodes.UsuarioNoEncontrado
+                );
+            }
 
             var orderItems = new List<OrderItem>();
 
@@ -83,6 +91,7 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 request.CustomerId,
+                customer.Name,
                 request.ShippingAddress,
                 request.BillingAddress,
                 order.OrderStatus,
@@ -97,6 +106,7 @@ namespace Dsw2025Tpi.Application.Services
             return orders?.Select(o => new OrderModel.Response(
                 o.Id,
                 o.CustomerId,
+                o.Customer.Name,
                 o.ShippingAddress,
                 o.BillingAddress,
                 o.OrderStatus,
@@ -111,6 +121,71 @@ namespace Dsw2025Tpi.Application.Services
                     )).ToList()
             ));
         }
+        public async Task<OrderModel.ResponsePagination> GetOrdersPagination(OrderModel.FilterOrders request)
+        {
+            string search = request.Search?.ToLower() ?? "";
+
+            // Mapear string → enum OrderStatus
+            OrderStatus? statusFilter = request.Status?.ToLower() switch
+            {
+                "pending" => OrderStatus.PENDING,
+                "inprocess" => OrderStatus.PROCESSING,
+                "cancelled" => OrderStatus.CANCELED,
+                "delivered" => OrderStatus.DELIVERED,
+                "shipped" => OrderStatus.SHIPPED,
+                _ => null  // "all" → null
+            };
+
+            var filteredOrders = await _repository.GetFiltered<Order>(
+                o =>
+                    // ✔ filtro de estado (opcional)
+                    (statusFilter == null || o.OrderStatus == statusFilter) &&
+
+                    // ✔ filtro de búsqueda
+                    (string.IsNullOrEmpty(search)
+                        || (o.ShippingAddress != null && o.ShippingAddress.ToLower().Contains(search))
+                        || (o.BillingAddress != null && o.BillingAddress.ToLower().Contains(search))
+                        || (o.Notes != null && o.Notes.ToLower().Contains(search))),
+
+                // Includes para EF
+                "Customer",
+                "OrderItem.Product"
+            );
+
+            if (filteredOrders == null || !filteredOrders.Any())
+            {
+                return new OrderModel.ResponsePagination(new List<OrderModel.Response>(), 0);
+            }
+
+
+            int pageNumber = request.PageNumber ?? 1;
+            int pageSize = request.PageSize ?? filteredOrders.Count();
+
+            var paginated = filteredOrders
+                .OrderBy(o => o.Date)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(o => new OrderModel.Response(
+                    o.Id,
+                    o.CustomerId,
+                    o.Customer.Name,
+                    o.ShippingAddress ?? "",
+                    o.BillingAddress ?? "",
+                    o.OrderStatus,
+                    o.OrderItem.Select(i => new OrderItemModel.Request(
+                        i.Quantity,
+                        i.ProductId ?? Guid.Empty,
+                        i.Product.Name,
+                        i.Product.Description,
+                        i.UnitPrice
+                    )).ToList()
+                ))
+                .ToList();
+
+            return new OrderModel.ResponsePagination(paginated, filteredOrders.Count());
+        }
+
+
 
         public async Task<OrderModel.Response?> GetOrderById(Guid id)
         {
@@ -127,6 +202,7 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 order.CustomerId,
+                order.Customer.Name,
                 order.ShippingAddress,
                 order.BillingAddress,
                 order.OrderStatus,
@@ -158,6 +234,7 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 order.CustomerId,
+                order.Customer.Name,
                 order.ShippingAddress,
                 order.BillingAddress,
                 order.OrderStatus,
