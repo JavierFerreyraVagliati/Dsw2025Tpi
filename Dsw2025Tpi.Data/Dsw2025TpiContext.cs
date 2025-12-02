@@ -1,4 +1,5 @@
 ﻿using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2025Tpi.Data;
@@ -33,6 +34,10 @@ public class Dsw2025TpiContext: DbContext
                     .WithOne(o => o.Customer)
                     .HasForeignKey(o => o.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
+            customer.HasOne<IdentityUser>() 
+        .WithMany()             
+        .HasForeignKey(c => c.UserId);
+
         });
 
         modelBuilder.Entity<Order>(order =>

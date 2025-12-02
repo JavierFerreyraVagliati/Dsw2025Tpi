@@ -16,6 +16,7 @@ namespace Dsw2025Tpi.Api.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly JwtTokenService _jwtTokenService;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly CustomerManagmentService _customerService;
 
         public AuthenticateController(
             UserManager<IdentityUser> userManager,
@@ -60,38 +61,77 @@ namespace Dsw2025Tpi.Api.Controllers
         // ============================
         // REGISTER
         // ============================
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        //{
+        //    var existing = await _userManager.FindByNameAsync(model.Username);
+        //    if (existing != null)
+        //        throw new ConflictException(
+        //            "El usuario ya existe",
+        //            ErrorCodes.DatosInvalidos
+        //        );
+
+        //    var user = new IdentityUser
+        //    {
+        //        UserName = model.Username,
+        //        Email = model.Email,
+
+        //    };
+
+        //    var result = await _userManager.CreateAsync(user, model.Password);
+        //    if (!await _roleManager.RoleExistsAsync(model.Role))
+        //    {
+        //        throw new ValidationAppException($"El rol {model.Role} no existe", ErrorCodes.DatosInvalidos);
+        //    }
+        //    await _userManager.AddToRoleAsync(user, model.Role);
+
+        //    if (!result.Succeeded)
+        //    {
+        //        // normalizamos errores de Identity en un BAD REQUEST
+        //        var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+
+        //        throw new ValidationAppException(
+        //            errorMessage,
+        //            ErrorCodes.DatosInvalidos
+        //        );
+        //    }
+
+        //    return this.ApiCreated(new { username = model.Username }, "Usuario registrado correctamente");
+        //}
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var existing = await _userManager.FindByNameAsync(model.Username);
             if (existing != null)
-                throw new ConflictException(
-                    "El usuario ya existe",
-                    ErrorCodes.DatosInvalidos
-                );
+                throw new ConflictException("El usuario ya existe", ErrorCodes.DatosInvalidos);
 
             var user = new IdentityUser
             {
                 UserName = model.Username,
                 Email = model.Email,
-
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (!await _roleManager.RoleExistsAsync(model.Role))
-            {
                 throw new ValidationAppException($"El rol {model.Role} no existe", ErrorCodes.DatosInvalidos);
-            }
+
             await _userManager.AddToRoleAsync(user, model.Role);
 
             if (!result.Succeeded)
             {
-                // normalizamos errores de Identity en un BAD REQUEST
                 var errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+                throw new ValidationAppException(errorMessage, ErrorCodes.DatosInvalidos);
+            }
 
-                throw new ValidationAppException(
-                    errorMessage,
-                    ErrorCodes.DatosInvalidos
+            // ✅ Crear Customer solo si el rol es "Customer"
+            if (model.Role.Equals("Customer", StringComparison.OrdinalIgnoreCase))
+            {
+                var customer = await _customerService.CreateCustomerForUserAsync(user, model.Username, model.Email);
+
+                return this.ApiCreated(
+                    new { username = model.Username, customerId = customer.Id },
+                    "Usuario y cliente registrados correctamente"
                 );
             }
 
@@ -99,6 +139,6 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
 
-        
+
     }
 }
