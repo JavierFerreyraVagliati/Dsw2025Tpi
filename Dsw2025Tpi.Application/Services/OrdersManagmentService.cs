@@ -82,7 +82,7 @@ namespace Dsw2025Tpi.Application.Services
             var order = new Order(
                 shippingAddress: request.ShippingAddress,
                 billingAddress: request.BillingAddress,
-                customerId: request.CustomerId,
+                customerId: customer.Id,
                 orderItems: orderItems
             );
 
