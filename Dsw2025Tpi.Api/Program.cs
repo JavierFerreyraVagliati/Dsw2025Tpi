@@ -193,7 +193,7 @@ public class Program
     {
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roles = { "ADMIN", "CUSTOMER", "SELLER" };
+        string[] roles = { "admin", "customer", "seller" };
 
         foreach (var role in roles)
         {
