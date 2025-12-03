@@ -22,29 +22,29 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-       
+
         // Cargar configuración JWT
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("JWT Key");
         var key = Encoding.UTF8.GetBytes(keyText);
 
         // Para Identity (usuarios, roles, tokens)
-        builder.Services.AddDbContext<AuthenticateContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
-        });
+        //builder.Services.AddDbContext<AuthenticateContext>(options =>
+        //{
+        //    options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
+        //});
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
-        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
-            options.UseSeeding((c, t) =>
-            {
-                ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
-            });
-        });
+        //builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        //{
+        //    options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
+        //    options.UseSeeding((c, t) =>
+        //    {
+        //        ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
+        //    });
+        //});
         builder.Services.AddProblemDetails(options =>
         {
             options.CustomizeProblemDetails = ctx =>
@@ -65,7 +65,7 @@ public class Program
                 RequireLowercase = true,
             };
         })
-        .AddEntityFrameworkStores<AuthenticateContext>()
+        .AddEntityFrameworkStores<Dsw2025TpiContext>()
         .AddDefaultTokenProviders();
 
         // Autenticación JWT
@@ -105,7 +105,9 @@ public class Program
         // Servicios propios
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductsManagmentService>();
+        builder.Services.AddScoped<AuthManagementService>();
         builder.Services.AddSingleton<JwtTokenService>();
+
         builder.Services.AddDomainServices(builder.Configuration);
 
         // Controladores
@@ -160,8 +162,9 @@ public class Program
         {
             var services = scope.ServiceProvider;
             var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
-            context.Seedwork<Customer>("Source\\customers.json");
-  
+
+            //context.Seedwork<Customer>("Source\\customers.json");
+
             await SeedRolesAsync(services);
         }
 

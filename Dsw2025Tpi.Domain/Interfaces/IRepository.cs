@@ -1,4 +1,5 @@
 ﻿using Dsw2025Tpi.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
 namespace Dsw2025Tpi.Domain.Interfaces;
@@ -12,4 +13,5 @@ public interface IRepository
     Task<T> Add<T>(T entity) where T : EntityBase;
     Task<T> Update<T>(T entity) where T : EntityBase;
     Task<T> Delete<T>(T entity) where T : EntityBase;
+    Task<IDbContextTransaction> BeginTransactionAsync();
 }
