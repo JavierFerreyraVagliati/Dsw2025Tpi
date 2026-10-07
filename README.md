@@ -1,7 +1,10 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software
 ### Backend
-
+## Ramas del repositorio
+- `main`: versión estable, de producción.
+- `development`: rama de integración. Es la rama por defecto.
+- Ambas están protegidas: todo cambio entra por Pull Request con 1 aprobación de otro integrante.
 ## Introducción
 Se desea desarrollar una plataforma de comercio electrónico (E-commerce). 
 En esta primera etapa el objetivo es construir el módulo de Órdenes, permitiendo la gestión completa de éstas.
