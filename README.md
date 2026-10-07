@@ -27,5 +27,18 @@ Del relevamiento preliminar se identificaron los siguientes requisitos:
 
 ### Características de la Solución
 
+## Convención de ramas
+
+| Tipo | Sale de | PR hacia | Ejemplo |
+|---|---|---|---|
+| feature/ | development | development | feature/dockerfile-api |
+| hotfix/ | main | main y luego development | hotfix/swagger-produccion |
+| Pase a producción | — | PR de development a main | — |
+
+- `feature/nombre-funcionalidad`: nuevas funcionalidades o tareas del sprint.
+- `hotfix/descripcion`: correcciones urgentes sobre producción.
+- El nombre de la rama corresponde a su tarjeta de Trello.
+- No se permiten commits directos sobre main ni development.
+
 - Lenguaje: C# 12.0
 - Plataforma: .NET 8
