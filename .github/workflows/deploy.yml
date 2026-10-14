@@ -1,0 +1,64 @@
+# Pipeline CI/CD de la API Dsw2025Tpi
+# Etapas: 1) restaurar + compilar la API  ->  2) construir la imagen Docker y dejarla lista para el despliegue.
+# Si una etapa falla, las que dependen de ella (needs) no se ejecutan.
+
+name: CI/CD - API Dsw2025Tpi
+
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [development, main]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION: Dsw2025Tpi.sln
+  IMAGE_NAME: dsw2025tpi-api
+
+jobs:
+  build:
+    name: Restaurar y compilar API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restaurar dependencias
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Compilar en Release (compilación limpia)
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore --no-incremental
+
+  docker:
+    name: Construir imagen Docker
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Construir la imagen
+        run: |
+          docker build \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -f Dockerfile \
+            .
+
+      - name: Exportar la imagen como artefacto
+        if: github.event_name != 'pull_request'
+        run: docker save ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest | gzip > ${{ env.IMAGE_NAME }}.tar.gz
+
+      - name: Publicar artefacto para la etapa de despliegue
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: imagen-docker-${{ github.sha }}
+          path: ${{ env.IMAGE_NAME }}.tar.gz
+          retention-days: 7
