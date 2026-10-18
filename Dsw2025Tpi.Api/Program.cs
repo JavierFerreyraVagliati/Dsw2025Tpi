@@ -30,7 +30,15 @@ public class Program
 
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                // La base Azure SQL free se pausa sola: reintenta mientras se despierta
+                // en lugar de tirar la app (evita reinicios en loop y consumo de cuota).
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 10,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            });
             options.UseSeeding((c, t) =>
             {
                 ((Dsw2025TpiContext)c).Seedwork<Customer>(Path.Combine("Source", "customers.json"));
