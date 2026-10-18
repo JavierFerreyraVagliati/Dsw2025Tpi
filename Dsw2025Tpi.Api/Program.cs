@@ -22,12 +22,18 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
+        // La connection string se lee de la configuracion:
+        //  - Local: appsettings.Development.json (LocalDB)
+        //  - Azure: variable de entorno ConnectionStrings__Dsw2025TpiDb
+        var connectionString = builder.Configuration.GetConnectionString("Dsw2025TpiDb")
+            ?? throw new InvalidOperationException("Falta la connection string 'Dsw2025TpiDb'.");
+
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
-            options.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Dsw2025TpiDb; Integrated Security = True;");
+            options.UseSqlServer(connectionString);
             options.UseSeeding((c, t) =>
             {
-                ((Dsw2025TpiContext)c).Seedwork<Customer>("Source\\customers.json");
+                ((Dsw2025TpiContext)c).Seedwork<Customer>(Path.Combine("Source", "customers.json"));
             });
         });
 
@@ -59,6 +65,13 @@ public class Program
         builder.Services.AddScoped<CustomerManagmentService>();
 
         var app = builder.Build();
+
+        // Aplica las migraciones pendientes (y el seed) al iniciar, para que la base de Azure quede creada.
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
+            context.Database.Migrate();
+        }
 
         // Habilitamos Swagger para TODOS los entornos (Local y Azure Production)
         app.UseSwagger();
