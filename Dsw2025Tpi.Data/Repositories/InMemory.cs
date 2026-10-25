@@ -1,5 +1,7 @@
 ﻿using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text.Json;
 
@@ -10,20 +12,24 @@ public class InMemory : IRepository
 {
     private List<Customer>? _Customers;
 
-    public InMemory()
-    {
-        LoadCustomers();
-    }
+    //public InMemory()
+    //{
+    //    LoadCustomers();
+    //}
 
-    private void LoadCustomers()
-    {
-        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Source\\customers.json"));
-        _Customers = JsonSerializer.Deserialize<List<Customer>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-        });
-    }
+    //private void LoadCustomers()
+    //{
+    //    var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Source\\customers.json"));
+    //    _Customers = JsonSerializer.Deserialize<List<Customer>>(json, new JsonSerializerOptions
+    //    {
+    //        PropertyNameCaseInsensitive = true,
+    //    });
+    //}
 
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        throw new NotImplementedException();
+    }
     private List<T>? GetList<T>() where T : EntityBase
     {
         return typeof(T).Name switch
