@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dsw2025Tpi.Application.Common.Errors;
+using System;
 
 namespace Dsw2025Tpi.Application.Exceptions;
 
-public class DuplicatedEntityException : System.ApplicationException
+public class DuplicatedEntityException : AppException
 {
-    public DuplicatedEntityException(string message) : base(message)
+    public DuplicatedEntityException(string message, int errorCode)
+         : base(message, errorCode, 404)
     {
-
     }
 }
