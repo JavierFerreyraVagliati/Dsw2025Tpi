@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E4538D47
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dsw2025Tpi.UnitTests", "tests\Dsw2025Tpi.UnitTests\Dsw2025Tpi.UnitTests.csproj", "{F4988BAB-933A-4A70-B863-50F254AAB2EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dsw2025Tpi.IntegrationTests", "tests\Dsw2025Tpi.IntegrationTests\Dsw2025Tpi.IntegrationTests.csproj", "{5B0A95B4-216C-412A-8884-5EC6B3FEE65B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{F4988BAB-933A-4A70-B863-50F254AAB2EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4988BAB-933A-4A70-B863-50F254AAB2EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4988BAB-933A-4A70-B863-50F254AAB2EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B0A95B4-216C-412A-8884-5EC6B3FEE65B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B0A95B4-216C-412A-8884-5EC6B3FEE65B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B0A95B4-216C-412A-8884-5EC6B3FEE65B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B0A95B4-216C-412A-8884-5EC6B3FEE65B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{E34B93C6-D34C-409A-AAF4-908795FFEB4E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AD606BCA-F693-45E2-A6BD-3C7FCBADE0D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{F4988BAB-933A-4A70-B863-50F254AAB2EF} = {E4538D47-3797-4CBF-8E41-870B5FD6FBBC}
+		{5B0A95B4-216C-412A-8884-5EC6B3FEE65B} = {E4538D47-3797-4CBF-8E41-870B5FD6FBBC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E30FA157-23DF-49B5-AD66-0394DCB75767}

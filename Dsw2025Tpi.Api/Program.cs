@@ -157,7 +157,14 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
-            services.GetRequiredService<Dsw2025TpiContext>().Database.Migrate();
+            var db = services.GetRequiredService<Dsw2025TpiContext>();
+
+            // En las pruebas de integración la base es SQLite en memoria: las migraciones
+            // son de SQL Server, así que el esquema se crea directo desde el modelo.
+            if (app.Environment.IsEnvironment("Testing"))
+                db.Database.EnsureCreated();
+            else
+                db.Database.Migrate();
 
             await SeedRolesAsync(services);
             await SeedAdminsAsync(services, Path.Combine(AppContext.BaseDirectory, "admins.json"));
