@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
+using Dsw2025Tpi.Application.Common.Errors;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
@@ -107,5 +109,105 @@ public class ProductsManagmentServiceTests
         response!.ProductItems.Should().HaveCount(3);
         response.TotalItems.Should().Be(3);
         response.ProductItems.Select(p => p.Sku).Should().BeEquivalentTo(new[] { "SKU-01", "MOUSE-WIRELESS", "SKU-03" });
+    }
+
+    [Fact]
+    public async Task AddProduct_WithValidData_ReturnsProductAndCallsRepositoryAdd()
+    {
+        // 1. ARRANGE
+        var request = new ProductModel.RequestProduct(
+            "SKU-TEC-01",
+            "INT-001",
+            "Teclado Mecánico",
+            "Teclado switch rojo",
+            100m,
+            10
+        );
+
+        Product? capturedProduct = null;
+
+        _repositoryMock
+            .Setup(r => r.First<Product>(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<string[]>()))
+            .ReturnsAsync((Product)null!);
+
+        _repositoryMock
+            .Setup(r => r.Add(It.IsAny<Product>()))
+            .Callback<Product>(p => capturedProduct = p)
+            .ReturnsAsync((Product p) => p);
+
+        // 2. ACT
+        var response = await _service.AddProduct(request);
+
+        // 3. ASSERT
+        response.Should().NotBeNull();
+        response.Sku.Should().Be("SKU-TEC-01");
+        response.Name.Should().Be("Teclado Mecánico");
+        response.CurrentUnitPrice.Should().Be(100m);
+        response.StockQuantity.Should().Be(10);
+        response.IsActive.Should().BeTrue();
+
+        capturedProduct.Should().NotBeNull();
+        response.Id.Should().Be(capturedProduct!.Id);
+
+        _repositoryMock.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddProduct_WithDuplicateSku_ThrowsDuplicatedEntityException()
+    {
+        // 1. ARRANGE
+        var existingProduct = new Product("SKU-MOU-02", "INT-002", "Mouse Gamer", "Mouse inalámbrico", 50m, 8);
+
+        var request = new ProductModel.RequestProduct(
+            "SKU-MOU-02",
+            "INT-003",
+            "Mouse Gamer RGB",
+            "Mouse con luces",
+            60m,
+            5
+        );
+
+        _repositoryMock
+            .Setup(r => r.First<Product>(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<string[]>()))
+            .ReturnsAsync(existingProduct);
+
+        // 2. ACT
+        Func<Task> act = async () => await _service.AddProduct(request);
+
+        // 3. ASSERT
+        var exception = await act.Should().ThrowAsync<DuplicatedEntityException>();
+        exception.Which.ErrorCode.Should().Be(ErrorCodes.ProductoConMismoSku);
+
+        _repositoryMock.Verify(r => r.Add(It.IsAny<Product>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(0, 100)]   // stock en cero
+    [InlineData(-3, 100)]  // stock negativo
+    [InlineData(10, -1)]   // precio negativo
+    public async Task AddProduct_WithInvalidStockOrPrice_ThrowsInvalidDataException(int stock, decimal price)
+    {
+        // 1. ARRANGE
+        var request = new ProductModel.RequestProduct(
+            "SKU-MON-03",
+            "INT-004",
+            "Monitor 27",
+            "Monitor IPS FHD",
+            price,
+            stock
+        );
+
+        // 2. ACT
+        Func<Task> act = async () => await _service.AddProduct(request);
+
+        // 3. ASSERT
+        // En el proyecto los datos inválidos se informan con ValidationAppException
+        var exception = await act.Should().ThrowAsync<ValidationAppException>();
+        exception.Which.ErrorCode.Should().Be(ErrorCodes.DatosInvalidos);
+        exception.Which.Message.Should().NotBeNullOrWhiteSpace();
+
+        // Se rechaza antes de consultar o guardar en el repositorio
+        _repositoryMock.Verify(r => r.First<Product>(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<string[]>()), Times.Never);
+        _repositoryMock.Verify(r => r.Add(It.IsAny<Product>()), Times.Never);
     }
 }
