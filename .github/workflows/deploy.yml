@@ -1,6 +1,7 @@
 # Pipeline CI/CD de la API Dsw2025Tpi
 # Etapas: 1) restaurar + compilar la API  ->  2) ejecutar las pruebas automatizadas (Quality Gate)
 #         ->  3) construir la imagen Docker y subirla a Docker Hub  ->  4) desplegar en Azure App Service.
+# En la etapa de pruebas también se mide la cobertura de código (coverlet).
 # Si una etapa falla, las que dependen de ella (needs) no se ejecutan:
 # si falla una sola prueba, no se construye la imagen ni se despliega.
 # En pull requests se compila, se ejecutan las pruebas y se construye la imagen (sin push ni deploy).
@@ -66,6 +67,7 @@ jobs:
           --no-restore
           --logger "console;verbosity=normal"
           --logger trx
+          --collect:"XPlat Code Coverage"
           --results-directory TestResults
 
       - name: Resumen de resultados
@@ -84,12 +86,34 @@ jobs:
             echo "| $(basename "$f") | $total | $passed | $failed |" >> "$GITHUB_STEP_SUMMARY"
           done
 
+      # Cobertura de código medida con coverlet (un reporte Cobertura por proyecto de pruebas).
+      - name: Resumen de cobertura de código
+        if: always()
+        run: |
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Cobertura de código" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Pruebas | Líneas cubiertas | Ramas cubiertas |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          for f in TestResults/*/coverage.cobertura.xml; do
+            [ -f "$f" ] || continue
+            line=$(grep -o -m1 'line-rate="[0-9.]*"' "$f" | grep -o '[0-9.]*' | head -1)
+            branch=$(grep -o -m1 'branch-rate="[0-9.]*"' "$f" | grep -o '[0-9.]*' | head -1)
+            line_pct=$(awk -v r="$line" 'BEGIN { printf "%.1f%%", r * 100 }')
+            branch_pct=$(awk -v r="$branch" 'BEGIN { printf "%.1f%%", r * 100 }')
+            # El reporte de integración incluye la capa Api; el de unitarias, solo Application y Domain
+            if grep -q 'package name="Dsw2025Tpi.Api"' "$f"; then nivel="Integración y E2E"; else nivel="Unitarias"; fi
+            echo "| $nivel | $line_pct | $branch_pct |" >> "$GITHUB_STEP_SUMMARY"
+          done
+
       - name: Guardar resultados como artefacto
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: resultados-pruebas
-          path: TestResults/*.trx
+          path: |
+            TestResults/*.trx
+            TestResults/*/coverage.cobertura.xml
           if-no-files-found: warn
 
   docker:
