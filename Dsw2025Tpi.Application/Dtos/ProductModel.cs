@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,6 @@ public record ProductModel
     public record RequestProduct(string Sku, string? InternalCode, string? Name, string? Description, decimal? CurrentUnitPrice, int? StockQuantity);
 
     public record ResponseProduct(Guid Id, string? Sku, string? InternalCode, string? Name, string? Description, decimal? CurrentUnitPrice, int? StockQuantity, bool IsActive);
-public record ResponsePagination(List<ResponseProduct> ProductItems, int Total);
+public record ResponsePagination(List<ResponseProduct> ProductItems, int TotalItems);
 public record FilterProduct(string? Status, string? Search, int? PageNumber, int? PageSize);
 }
