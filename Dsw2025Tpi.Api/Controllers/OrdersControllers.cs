@@ -23,7 +23,7 @@ namespace Dsw2025Tpi.Api.Controllers
         public async Task<IActionResult> AddOrder([FromBody] OrderModel.Request request)
         {
             var order = await _service.AddOrder(request);
-            return this.ApiCreated(order, "Order created successfully");
+            return this.ApiCreatedAt($"/api/orders/{order.OrderId}", order, "Order created successfully");
         }
 
         [HttpGet]

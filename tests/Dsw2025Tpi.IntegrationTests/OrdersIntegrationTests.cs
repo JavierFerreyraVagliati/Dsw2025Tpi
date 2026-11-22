@@ -78,6 +78,10 @@ public class OrdersIntegrationTests : IAsyncLifetime
         savedOrder.Should().NotBeNull();
         savedOrder!.OrderItem.Should().HaveCount(2);
 
+        // El header Location apunta a la orden creada
+        response.Headers.Location.Should().NotBeNull();
+        response.Headers.Location!.ToString().Should().Be($"/api/orders/{savedOrder.Id}");
+
         var updatedProduct1 = await _factory.ExecuteDbContextAsync(async db =>
             await db.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == product1.Id));
 
