@@ -78,7 +78,7 @@ public class ProductsManagmentService
         if (string.IsNullOrWhiteSpace(request.Sku) ||
             string.IsNullOrWhiteSpace(request.Name) ||
             request.CurrentUnitPrice < 0 || 
-            request.StockQuantity < 0
+            request.StockQuantity <= 0
             )
         {
             throw new ValidationAppException("Valores para el producto no válidos", ErrorCodes.DatosInvalidos);
