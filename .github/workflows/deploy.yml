@@ -1,8 +1,9 @@
 # Pipeline CI/CD de la API Dsw2025Tpi
-# Etapas: 1) restaurar + compilar la API  ->  2) construir la imagen Docker y subirla a Docker Hub
-#         ->  3) desplegar la imagen en Azure App Service.
-# Si una etapa falla, las que dependen de ella (needs) no se ejecutan.
-# En pull requests solo se compila y se construye la imagen (sin push ni deploy).
+# Etapas: 1) restaurar + compilar la API  ->  2) ejecutar las pruebas automatizadas (Quality Gate)
+#         ->  3) construir la imagen Docker y subirla a Docker Hub  ->  4) desplegar en Azure App Service.
+# Si una etapa falla, las que dependen de ella (needs) no se ejecutan:
+# si falla una sola prueba, no se construye la imagen ni se despliega.
+# En pull requests se compila, se ejecutan las pruebas y se construye la imagen (sin push ni deploy).
 #
 # Secrets requeridos (Settings > Secrets and variables > Actions):
 #   DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, APP_SERVICE_NAME, AZURE_WEBAPP_PUBLISH_PROFILE
@@ -40,9 +41,60 @@ jobs:
       - name: Compilar en Release (compilación limpia)
         run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore --no-incremental
 
+  test:
+    name: Ejecutar pruebas (Quality Gate)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restaurar dependencias
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      # Ejecuta todos los proyectos de prueba de la solución (unitarias e integración).
+      # Si alguna prueba falla, el comando termina con error y el pipeline se detiene acá.
+      - name: Ejecutar pruebas unitarias y de integración
+        run: >
+          dotnet test ${{ env.SOLUTION }}
+          --configuration Release
+          --no-restore
+          --logger "console;verbosity=normal"
+          --logger trx
+          --results-directory TestResults
+
+      - name: Resumen de resultados
+        if: always()
+        run: |
+          echo "## Resultados de las pruebas" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Archivo | Total | Correctas | Fallidas |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          for f in TestResults/*.trx; do
+            [ -f "$f" ] || continue
+            c=$(grep -o '<Counters [^>]*>' "$f")
+            total=$(echo "$c" | grep -o 'total="[0-9]*"' | grep -o '[0-9]*')
+            passed=$(echo "$c" | grep -o 'passed="[0-9]*"' | grep -o '[0-9]*')
+            failed=$(echo "$c" | grep -o 'failed="[0-9]*"' | grep -o '[0-9]*')
+            echo "| $(basename "$f") | $total | $passed | $failed |" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Guardar resultados como artefacto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: TestResults/*.trx
+          if-no-files-found: warn
+
   docker:
     name: Construir y publicar imagen Docker
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     env:
       IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/dsw2025tpi-api
