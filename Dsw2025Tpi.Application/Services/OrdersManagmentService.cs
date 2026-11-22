@@ -91,7 +91,7 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 request.CustomerId,
-                customer.Name,
+                customer.Name ?? "",
                 request.ShippingAddress,
                 request.BillingAddress,
                 order.OrderStatus,
@@ -101,22 +101,22 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<IEnumerable<OrderModel.Response>?> GetOrders()
         {
-            var orders = await _repository.GetAll<Order>("OrderItem.Product");
+            var orders = await _repository.GetAll<Order>("Customer", "OrderItem.Product");
 
             return orders?.Select(o => new OrderModel.Response(
                 o.Id,
                 o.CustomerId,
-                o.Customer.Name,
-                o.ShippingAddress,
-                o.BillingAddress,
+                o.Customer?.Name ?? "",
+                o.ShippingAddress ?? "",
+                o.BillingAddress ?? "",
                 o.OrderStatus,
                 o.OrderItem
                     .Where(oi => oi.ProductId.HasValue)
                     .Select(oi => new OrderItemModel.Request(
                         oi.Quantity,
-                        oi.ProductId.Value,
-                        oi.Product?.Name,
-                        oi.Product?.Description,
+                        oi.ProductId!.Value,
+                        oi.Product?.Name ?? "",
+                        oi.Product?.Description ?? "",
                         oi.Product?.CurrentUnitPrice
                     )).ToList()
             ));
@@ -168,15 +168,15 @@ namespace Dsw2025Tpi.Application.Services
                 .Select(o => new OrderModel.Response(
                     o.Id,
                     o.CustomerId,
-                    o.Customer.Name,
+                    o.Customer?.Name ?? "",
                     o.ShippingAddress ?? "",
                     o.BillingAddress ?? "",
                     o.OrderStatus,
                     o.OrderItem.Select(i => new OrderItemModel.Request(
                         i.Quantity,
                         i.ProductId ?? Guid.Empty,
-                        i.Product.Name,
-                        i.Product.Description,
+                        i.Product?.Name ?? "",
+                        i.Product?.Description ?? "",
                         i.UnitPrice
                     )).ToList()
                 ))
@@ -189,7 +189,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<OrderModel.Response?> GetOrderById(Guid id)
         {
-            var order = await _repository.GetById<Order>(id, "OrderItem.Product");
+            var order = await _repository.GetById<Order>(id, "Customer", "OrderItem.Product");
 
             if (order == null)
             {
@@ -202,25 +202,25 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 order.CustomerId,
-                order.Customer.Name,
-                order.ShippingAddress,
-                order.BillingAddress,
+                order.Customer?.Name ?? "",
+                order.ShippingAddress ?? "",
+                order.BillingAddress ?? "",
                 order.OrderStatus,
                 order.OrderItem
                     .Where(oi => oi.ProductId.HasValue)
                     .Select(oi => new OrderItemModel.Request(
                         oi.Quantity,
-                        oi.ProductId.Value,
-                        oi.Product?.Name,
-                        oi.Product?.Description,
-                        oi.Product.CurrentUnitPrice
+                        oi.ProductId!.Value,
+                        oi.Product?.Name ?? "",
+                        oi.Product?.Description ?? "",
+                        oi.Product?.CurrentUnitPrice
                     )).ToList()
             );
         }
 
         public async Task<OrderModel.Response> UpdateOrderStatusAsync(Guid id, string newStatus)
         {
-            var order = await _repository.GetById<Order>(id, "OrderItem");
+            var order = await _repository.GetById<Order>(id, "Customer", "OrderItem.Product");
 
             if (order == null)
                 throw new EntityNotFoundException("Orden no encontrada.", ErrorCodes.PedidoNoEncontrado);
@@ -234,18 +234,18 @@ namespace Dsw2025Tpi.Application.Services
             return new OrderModel.Response(
                 order.Id,
                 order.CustomerId,
-                order.Customer.Name,
-                order.ShippingAddress,
-                order.BillingAddress,
+                order.Customer?.Name ?? "",
+                order.ShippingAddress ?? "",
+                order.BillingAddress ?? "",
                 order.OrderStatus,
                 order.OrderItem
                     .Where(oi => oi.ProductId.HasValue)
                     .Select(oi => new OrderItemModel.Request(
                         oi.Quantity,
-                        oi.ProductId.Value,
-                        oi.Product.Name,
-                        oi.Product.Description,
-                        oi.Product.CurrentUnitPrice
+                        oi.ProductId!.Value,
+                        oi.Product?.Name ?? "",
+                        oi.Product?.Description ?? "",
+                        oi.Product?.CurrentUnitPrice
                     ))
                     .ToList()
             );

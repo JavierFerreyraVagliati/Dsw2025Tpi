@@ -10,7 +10,7 @@ namespace Dsw2025Tpi.Data;
 
 public class InMemory : IRepository
 {
-    private List<Customer>? _Customers;
+    private readonly List<Customer> _Customers = new();
 
     //public InMemory()
     //{
@@ -26,7 +26,7 @@ public class InMemory : IRepository
     //    });
     //}
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    public Task<IDbContextTransaction> BeginTransactionAsync()
     {
         throw new NotImplementedException();
     }
