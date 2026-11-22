@@ -36,12 +36,81 @@ Del relevamiento preliminar se identificaron los siguientes requisitos:
 |---|---|---|---|
 | feature/ | development | development | feature/dockerfile-api |
 | hotfix/ | main | main y luego development | hotfix/swagger-produccion |
+| test/ | development | development | test/unit-create-order |
 | Pase a producción | — | PR de development a main | — |
 
 - `feature/nombre-funcionalidad`: nuevas funcionalidades o tareas del sprint.
 - `hotfix/descripcion`: correcciones urgentes sobre producción.
+- `test/tarea-realizada`: pruebas automatizadas y cambios de calidad (Sprint 3).
 - El nombre de la rama corresponde a su tarjeta de Trello.
 - No se permiten commits directos sobre main ni development.
 
 - Lenguaje: C# 12.0
 - Plataforma: .NET 8
+
+## Pruebas automatizadas
+
+La solución tiene una suite de pruebas que sigue la pirámide de testing:
+
+| Nivel | Proyecto | Qué prueba |
+|---|---|---|
+| Unitarias | `tests/Dsw2025Tpi.UnitTests` | La lógica de los servicios de Application, con el repositorio simulado (Moq). No usan base de datos. |
+| Integración | `tests/Dsw2025Tpi.IntegrationTests` | Los endpoints reales de la API (controllers, middlewares, JWT y EF Core) levantada en memoria con `WebApplicationFactory` y SQLite en memoria. |
+| End-to-End | `tests/Dsw2025Tpi.IntegrationTests/OrderEndToEndTests.cs` | Un flujo completo de compra encadenando llamadas HTTP. |
+
+### Cómo ejecutarlas
+
+Desde la raíz del repositorio:
+
+```bash
+dotnet test
+```
+
+Para ver el nombre y el resultado de cada prueba:
+
+```bash
+dotnet test --logger "console;verbosity=normal"
+```
+
+Para correr un solo proyecto:
+
+```bash
+dotnet test tests/Dsw2025Tpi.UnitTests
+dotnet test tests/Dsw2025Tpi.IntegrationTests
+```
+
+No hace falta SQL Server ni ninguna configuración extra: las pruebas de integración crean su propia base SQLite en memoria.
+
+### Escenarios cubiertos
+
+**Unitarias**
+- Creación de productos: alta válida, SKU duplicado, stock o precio inválido.
+- Creación de órdenes: total y descuento de stock, stock insuficiente, cliente inexistente.
+- Listado de productos: solo activos, paginación, búsqueda por nombre, SKU o código interno.
+
+**Integración**
+- `POST /api/products`: 401/403 sin permisos, 201 con persistencia, 409 por SKU duplicado.
+- `POST /api/orders`: 401 sin token, 201 con orden y stock persistidos, 400 por stock insuficiente.
+- `GET /api/products` y `/api/products/admin`: acceso público, filtros por query string, inactivos solo para admin.
+
+### Infraestructura de integración
+
+`CustomWebApplicationFactory` levanta la API en el entorno `Testing` y reemplaza SQL Server por SQLite en memoria. Ofrece helpers para escribir pruebas nuevas:
+
+- `CreateAnonymousClient()` y `CreateClientWithRole("admin")`: clientes HTTP sin token o con un JWT válido.
+- `SeedProductAsync(...)` y `SeedCustomerAsync(...)`: carga de datos de prueba.
+- `ExecuteDbContextAsync(...)`: consultas directas a la base para verificar resultados.
+- `ResetDatabaseAsync()`: deja la base limpia antes de cada prueba.
+
+Las clases de integración usan `[Collection(IntegrationTestsCollection.Name)]` para compartir una sola API en memoria y ejecutarse de a una.
+
+### Quality Gate en el pipeline
+
+El workflow `.github/workflows/deploy.yml` ejecuta todas las pruebas en cada push y pull request hacia `development` y `main`:
+
+```
+Compilar  →  Ejecutar pruebas (Quality Gate)  →  Imagen Docker  →  Deploy en Azure
+```
+
+Si falla una sola prueba, el pipeline se detiene: no se construye la imagen ni se despliega.
+
