@@ -15,6 +15,12 @@ namespace Dsw2025Tpi.Api.Extensions
             return controller.StatusCode(201, ApiResult<T>.SuccessResult(data, message, 201));
         }
 
+        // 201 Created con el header Location apuntando al recurso creado
+        public static IActionResult ApiCreatedAt<T>(this ControllerBase controller, string location, T data, string? message = null)
+        {
+            return controller.Created(location, ApiResult<T>.SuccessResult(data, message, 201));
+        }
+
         public static IActionResult ApiNoContent(this ControllerBase controller)
         {
             return controller.StatusCode(204, ApiResult<object>.SuccessResult(null, "No content", 204));
