@@ -1,4 +1,4 @@
-﻿using Dsw2025Tpi.Api.Models;
+using Dsw2025Tpi.Api.Models;
 using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -41,10 +41,15 @@ using System.ComponentModel.DataAnnotations;
                     break;
             }
 
-            var response = ApiResult<object>.Error(message, status, errorCode);
-
-            context.Response.ContentType = "application/json";
             context.Response.StatusCode = status;
+
+            if (status == StatusCodes.Status204NoContent)
+            {
+                return Task.CompletedTask;
+            }
+
+            var response = ApiResult<object>.Error(message, status, errorCode);
+            context.Response.ContentType = "application/json";
 
             return context.Response.WriteAsJsonAsync(response);
         }
