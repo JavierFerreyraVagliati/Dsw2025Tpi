@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api.Extensions
 
         public static IActionResult ApiNoContent(this ControllerBase controller)
         {
-            return controller.StatusCode(204, ApiResult<object>.SuccessResult(null, "No content", 204));
+            return controller.StatusCode(204, ApiResult<object?>.SuccessResult(null, "No content", 204));
         }
     }
 

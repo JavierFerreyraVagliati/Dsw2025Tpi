@@ -10,7 +10,7 @@ namespace Dsw2025Tpi.Domain.Entities
     public class Product : EntityBase
     {
 
-        public string Sku { get; set; }
+        public string Sku { get; set; } = string.Empty;
         public string? Name { get; set; }
         public decimal? CurrentUnitPrice { get; set; }
         public int? StockQuantity { get; set; }
@@ -21,7 +21,7 @@ namespace Dsw2025Tpi.Domain.Entities
 
         public Product() { }
 
-        public Product(string sku, string internalCode, string name, string description, decimal? currentUnitPrice, int? stockQuantity)
+        public Product(string sku, string? internalCode, string? name, string? description, decimal? currentUnitPrice, int? stockQuantity)
         {
             Sku = sku;
             InternalCode = internalCode;

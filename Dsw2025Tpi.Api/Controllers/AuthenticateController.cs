@@ -173,11 +173,11 @@ namespace Dsw2025Tpi.Api.Controllers
                     "Usuario registrado correctamente"
                 );
             }
-            catch (ConflictException ex)
+            catch (ConflictException)
             {
                 throw; // Deja que tu middleware global lo maneje
             }
-            catch (ValidationAppException ex)
+            catch (ValidationAppException)
             {
                 throw; // Deja que tu middleware global lo maneje
             }
