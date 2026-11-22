@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,9 +43,14 @@ public class ProductsManagmentService
         if (!isAdmin)
             isActive = true;
 
+        var search = request.Search?.Trim().ToLower();
+
         var activeProducts = await _repository.GetFiltered<Product>(
             p => (isActive == null || p.IsActive == isActive) &&
-                 (string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
+                 (string.IsNullOrEmpty(search) ||
+                  (p.Name != null && p.Name.ToLower().Contains(search)) ||
+                  (p.Sku != null && p.Sku.ToLower().Contains(search)) ||
+                  (p.InternalCode != null && p.InternalCode.ToLower().Contains(search)))
         );
 
         if (activeProducts is null || !activeProducts.Any())
